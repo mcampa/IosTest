@@ -1,0 +1,276 @@
+<div class="well">
+	<h1>Order ID: <?php echo $order->getId(); ?></h1>
+	<p>Created at: <?php echo $order->createdDate()->format('Y-m-d H:i:s'); ?></p>
+	<p>Customer: <?php echo $order->getCustomer(); ?></p>
+</div>
+<a href="/ios/index">Back to Orders</a>
+
+<div class="well">
+	<div class="span7">
+		<a href="#addProductModal" role="button" class="btn btn-success" data-toggle="modal" id="newItem">Add Item</a>
+	</div>
+	<div class="span4">
+		<a href="#" id="deleteOrder" role="button" class="btn btn-danger"><i class="icon-remove icon-white"></i> Delete Order</a>
+		<a href="<?php echo '/ios/download/'.$order->getId();?>" role="button" class="btn btn-warning"><i class="icon-download-alt icon-white"></i> Download PDF</a>
+	</div>
+</div>
+<!-- New Item Modal -->
+<div id="addProductModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="addProductModalLabel">Add New Item</h3>
+	</div>
+	<div class="modal-body">
+			<form class="form-horizontal" id="newItemForm">
+				<div class="control-group">
+					<label class="control-label" for="addProduct">Product</label>
+					<div class="controls">
+						<input type="text" id="addProduct" placeholder="Product Description" name="product">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="addQty">Quantity</label>
+					<div class="controls">
+						<input type="text" id="addQty" value="1" class="span1" name="quantity">
+					</div>
+				</div>
+				<div class="control-group">			
+					<label class="control-label" for="addPrice">Price</label>
+					<div class="controls">
+						<div class="input-prepend">
+							<span class="add-on">$</span><input class="span1" type="text" id="addPrice" style="text-align:right;" name="price">
+						</div>
+					</div>
+				</div>
+			</form>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		<button class="btn btn-primary" data-bind="click: addItemClick">Add Item</button>
+	</div>
+</div>
+
+<!-- Edit Item Modal -->
+<div id="editProductModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="editProductModalLabel">Add New Item</h3>
+	</div>
+	<div class="modal-body">
+			<form class="form-horizontal">
+				<input type="hidden" id="editId" placeholder="Product Description" name="product">
+				<div class="control-group">
+					<label class="control-label" for="editProduct">Product</label>
+					<div class="controls">
+						<input type="text" id="editProduct" placeholder="Product Description" name="product">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="editQty">Quantity</label>
+					<div class="controls">
+						<input type="text" id="editQty" value="1" class="span1" name="quantity">
+					</div>
+				</div>
+				<div class="control-group">			
+					<label class="control-label" for="editPrice">Price</label>
+					<div class="controls">
+						<div class="input-prepend">
+							<span class="add-on">$</span><input class="span1" type="text" id="editPrice" style="text-align:right;" name="price">
+						</div>
+					</div>
+				</div>
+			</form>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		<button class="btn btn-primary" data-bind="click: editItemSave">Save Item</button>
+	</div>
+</div>
+<!--  -->
+
+<table class="table table-bordered table-hover">
+	<thead>    
+		<tr>
+			<th style="width:8%;"></th>
+			<th style="width:50%;">Products</th>
+			<th style="text-align:center; width:5%;">Qty</th>
+			<th style="text-align:right;width:10%;">Price</th>
+			<th style="text-align:right;width:10%;">Total</th>
+		</tr>
+	</thead>
+	<tbody data-bind="foreach: items">
+		<tr>
+			<td>
+				<a href="#" role="button" class="btn btn-danger btn-small" data-bind="click: $root.removeItemClick">
+					<i class="icon-remove icon-white"></i>
+				</a> 
+				<a href="#editProductModal" role="button" class="btn btn-primary btn-small" data-toggle="modal" data-bind="click: $root.editItemClick">
+					<i class="icon-edit icon-white"></i>
+				</a>
+			</td>
+			<td data-bind="text: product()"></td>
+			<td><span data-bind="text: quantity()"></span></td>
+			<td style="text-align:right;">$<span data-bind="text: price()"></span></td>
+			<td style="text-align:right;">$<span data-bind="text: total()"></span></td>
+		</tr>
+	</tbody>
+    <tfoot>
+		<tr>
+			<td colspan="4"></td>
+			<td style="text-align:right; font-size:20px;">$<strong data-bind="text: total"></strong></td>
+		</tr>
+    </tfoot>
+</table>
+
+
+<script type="text/javascript">
+
+	var order_id = <?php echo $order->getId(); ?>;
+
+	var ItemModel = function(item) {
+		this.id = ko.observable(item.id);
+		this.product = ko.observable(item.product);
+		this.quantity = ko.observable(parseInt(item.quantity));
+		this.price = ko.observable(parseFloat(item.price).toFixed(2));
+		this.total = ko.observable(parseFloat(item.price * item.quantity).toFixed(2));
+	}
+
+	var ViewModel = function() {
+		var self = this;
+
+	    var plainItem = function(item) {
+	    	return {id: item.id(), product: item.product(), quantity: item.quantity(), price: item.price()};
+	    }
+	 
+		var input = function(name) {
+			return $('#addProductModal input[name="'+name+'"]').val();
+		}
+
+		var validateItem = function(item) {
+			if (item.product.length < 1) return false;
+			if (isNaN(parseFloat(item.quantity)) || !isFinite(item.quantity)) return false;
+			if (isNaN(parseFloat(item.price)) || !isFinite(item.price)) return false;
+			return true;
+		}
+
+		self.calcTotal = function() {
+			var total = 0;
+
+			$.each(self.items(), function(index, item) {
+				total += parseFloat(item.total());
+			});
+			self.total(total.toFixed(2));
+
+			return total;	
+		}
+
+	    self.items = ko.observableArray([]);
+
+	    self.total = ko.observable(0);
+
+	 	self.editItemClick = function(item) {
+	 		$('#editId').val(item.id());
+	 		$('#editProduct').val(item.product());
+	 		$('#editQty').val(item.quantity());
+	 		$('#editPrice').val(item.price());
+	 	}
+
+	 	self.editItemSave = function() {
+	 		var item = { 
+	    		id: 		$('#editId').val(), 
+	    		product: 	$('#editProduct').val(), 
+	    		quantity: 	$('#editQty').val(), 
+	    		price: 		$('#editPrice').val(),
+	    	};
+
+			if (validateItem(item)) {
+				$.post('/ajax/updateItem/'+order_id, item, function(response) {
+					$('#editProductModal').modal('hide');
+			    	var items = self.items();
+			    	$.each(items, function(index, item) {
+			    		if(parseInt(item.id()) == parseInt(response.item.id)) {
+			    			items[index] = (new ItemModel(response.item));
+			    		}
+			    		self.items(items);
+		        		self.calcTotal();
+			    	});
+				}, 'json');
+			} else {
+				alert('Not Valid Inputs');
+			}
+	 	}
+
+	    self.addItemClick = function() {
+
+	    	var item = { 
+	    		product: input('product'), 
+	    		quantity: input('quantity'), 
+	    		price: input('price'),
+	    	};
+
+			if (validateItem(item)) {
+			    $.post('/ajax/saveItem/'+order_id, item, function(response) {
+					$('#addProductModal').modal('hide');
+		    		var item = response.item;
+		    		self.addItem(item);
+				}, 'json');
+			} else {				
+				alert('Not Valid Inputs');
+			}
+
+	    }
+
+	 	self.removeItemClick = function (item) {
+		    $.post('/ajax/removeItem/'+order_id, plainItem(item), function(response) {
+		    	var items = self.items();
+		    	for (var i = 0; i < items.length; i++) {
+		    		if(parseInt(items[i].id()) == parseInt(response.item.id)) {
+		    			items.splice(i, 1);
+		    			break;
+		    		}
+		    	}
+	    		self.items(items);
+        		self.calcTotal();
+
+			}, 'json');
+		}
+
+	    self.addItem = function(item) {
+
+	        self.items.push(new ItemModel(item));
+
+	        self.calcTotal();
+	    };
+
+
+	    $.post('/ajax/order/'+order_id, {}, function(response) {
+	    	if (response.items.length > 0) {
+	    		$.each(response.items, function(index, item) {
+		    		self.addItem(item);
+		    	});
+	    	} else {
+	    		$('#addProductModal').modal('show');
+	    	}	
+		}, 'json');	 
+	 
+	};	 
+
+	var viewModel = new ViewModel();
+	ko.applyBindings(viewModel);
+
+	$("#newItem").click(function() {
+		$('#addProduct').val('');
+		$('#addQty').val('1');
+		$('#addPrice').val('0.00');		
+		setTimeout(function() { $('#addProduct').focus();}, 500);
+	});
+
+	$("#deleteOrder").click(function() {
+		if (confirm("Are you sure?")) {
+			$.post('/ajax/deleteOrder/'+order_id, {order_id: order_id}, function(response) {
+	    		window.location = "/ios/index";	    	
+			}, 'json');	 
+		}
+	});
+
+</script>
