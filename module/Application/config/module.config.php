@@ -8,6 +8,21 @@
  */
 
 return array(
+    'doctrine' => array(
+        'driver' => array(
+            'application_entities' => array(
+                'class' =>'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'cache' => 'array',
+                'paths' => array(__DIR__ . '/../src/Application/Entity'),
+            ),
+
+            'orm_default' => array(
+                'drivers' => array(
+                    'Application\Entity' => 'application_entities',
+                ),
+            ),
+        ),
+    ),
     'router' => array(
         'routes' => array(
             'home' => array(
@@ -24,32 +39,63 @@ return array(
             // new controllers and actions without needing to create a new
             // module. Simply drop new controllers in, and you can access them
             // using the path /application/:controller/:action
-            'application' => array(
-                'type'    => 'Literal',
+            // 'application' => array(
+            //     'type'    => 'Literal',
+            //     'options' => array(
+            //         'route'    => '/application',
+            //         'defaults' => array(
+            //             '__NAMESPACE__' => 'Application\Controller',
+            //             'controller'    => 'Index',
+            //             'action'        => 'index',
+            //         ),
+            //     ),
+            //     'may_terminate' => true,
+            //     'child_routes' => array(
+            //         'default' => array(
+            //             'type'    => 'Segment',
+            //             'options' => array(
+            //                 'route'    => '/[:controller[/:action]][/:id]',
+            //                 'constraints' => array(
+            //                     'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+            //                     'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+            //                     'id'         => '[0-9]+',
+            //                 ),
+            //                 'defaults' => array(
+            //                 ),
+            //             ),
+            //         ),
+            //     ),
+            // ),
+            
+            'ios' => array(
+                'type' => 'segment',
                 'options' => array(
-                    'route'    => '/application',
-                    'defaults' => array(
-                        '__NAMESPACE__' => 'Application\Controller',
-                        'controller'    => 'Index',
-                        'action'        => 'index',
+                    'route' => '/ios[/:action][/:id]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
                     ),
-                ),
-                'may_terminate' => true,
-                'child_routes' => array(
-                    'default' => array(
-                        'type'    => 'Segment',
-                        'options' => array(
-                            'route'    => '/[:controller[/:action]]',
-                            'constraints' => array(
-                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                                'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
-                            ),
-                            'defaults' => array(
-                            ),
-                        ),
+                    'defaults' => array(
+                        'controller' => 'IosTest\ios',
+                        'action'     => 'index',
                     ),
                 ),
             ),
+            'ajax' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/ajax[/:action][/:id]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'IosTest\ajax',
+                        'action'     => 'index',
+                    ),
+                ),
+            ),
+
         ),
     ),
     'service_manager' => array(
@@ -69,7 +115,9 @@ return array(
     ),
     'controllers' => array(
         'invokables' => array(
-            'Application\Controller\Index' => 'Application\Controller\IndexController'
+            'Application\Controller\Index' => 'Application\Controller\IndexController',
+            'IosTest\ajax'                 => 'Application\Controller\ajaxController',
+            'IosTest\ios'                  => 'Application\Controller\iosController',
         ),
     ),
     'view_manager' => array(
@@ -86,6 +134,14 @@ return array(
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
+        ),        
+        'strategies' => array(
+            'ViewJsonStrategy',
+        ),
+    ),
+    'controller_plugins' => array(
+        'invokables' => array(
+            'xhtml2pdf' => 'Application\Controller\Plugin\xhtml2pdf',
         ),
     ),
 );

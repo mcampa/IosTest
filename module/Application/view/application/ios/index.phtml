@@ -1,0 +1,58 @@
+<div class="well">
+	<h1>Orders</h1>
+	<p><a id="newOrder" href="#newOrderModal" role="button" class="btn btn-success btn-large" data-toggle="modal">New Order</a></p>
+</div>
+
+<form method="post" action="/ios/new">
+	<div id="newOrderModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="NewOrderModalLabel" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="NewOrderModalLabel">Create New Order</h3>
+		</div>
+		<div class="modal-body">
+			Customer Name: <input id="newCustomer" type="text" name="customer">
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<button class="btn btn-primary" type="submit" >Create Order</button>
+		</div>
+	</div>
+</form>
+<table class="table table-bordered table-hover">
+	<thead>
+		<tr>
+			<th style="width:12%;">Action</th>
+			<th>Order ID</th>
+			<th style="width:18%;">Created Date</th>
+			<th style="width:40%;">Customer</th>
+			<th>Items In the Order</th>
+			<th style="width:10%;">Total</th>
+		</tr>	
+	</thead>
+	<tbody>
+		<?php foreach($orders as $order) : ?>
+		<tr>
+		    <td>
+				<a href="<?php echo '/ios/order/'.$order->getId();?>" role="button" class="btn btn-info">
+					<i class="icon-file icon-white"></i>
+				</a>
+				<a href="<?php echo '/ios/download/'.$order->getId();?>" role="button" class="btn btn-warning">
+					<i class="icon-download-alt icon-white"></i>
+				</a>
+		    </td>
+		    <td><?php echo sprintf('%04d', $order->getId());?></td>
+		    <td><?php echo $order->createdDate()->format("F j, Y, g:i a");?></td>
+		    <td><?php echo $order->getCustomer();?></td>
+		    <td><?php echo count($order->getItems());?></td>
+		    <td style="text-align:right;">$<?php echo number_format($order->getTotal(), 2);?></td>
+		</tr>
+		<?php endforeach; ?>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+	$("#newOrder").click(function() {
+		$('#newCustomer').val('');	
+		setTimeout(function() { $('#newCustomer').focus();}, 500);
+	});
+</script>

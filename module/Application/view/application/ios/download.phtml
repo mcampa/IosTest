@@ -1,0 +1,57 @@
+<html>
+<head>
+	<style type="text/css">
+		h2, p {
+			margin: 2px 0px;
+		}
+		div, table {
+			width: 100%;
+		}
+		.orderInfo {
+			border:1px solid #000; 
+			margin:50px 0px; 
+			padding:0px 10px;
+		}
+	</style>
+	<title>Order <?php echo sprintf('%04d', $order->getId()); ?></title>
+</head>
+<body>
+	<div>
+		<span>Author: Mario A Campa</span>
+		<span style="float:right;">Generated on: <?php echo date("F j, Y, g:i a"); ?></span>
+	</div>
+
+	<div  class="orderInfo">
+		<h2>Order ID: <?php echo sprintf('%04d', $order->getId()); ?></h2>
+		<p>Created at: <?php echo $order->createdDate()->format('Y-m-d H:i:s'); ?></p>
+		<p>Customer: <?php echo $order->getCustomer(); ?></p>
+	</div>
+
+	<table>
+		<thead>    
+			<tr>
+				<th style="width:50%;">Products</th>
+				<th style="text-align:center; width:5%;">Qty</th>
+				<th style="text-align:right;width:10%;">Price</th>
+				<th style="text-align:right;width:10%;">Total</th>
+			</tr>
+		</thead>
+		<tbody data-bind="foreach: items">
+			<?php foreach ($order->getItems() as $item) : ?>
+				<tr>
+					<td><?php echo $item->getProduct(); ?></td>
+					<td style="text-align:center;"><?php echo $item->getQuantity(); ?></td>
+					<td style="text-align:right;">$<?php echo number_format($item->getPrice(), 2); ?></td>
+					<td style="text-align:right;">$<?php echo number_format($item->getPrice() * $item->getQuantity(), 2); ?></td>
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	    <tfoot>
+			<tr>
+				<td colspan="3"></td>
+				<td style="text-align:right;"><strong>$<?php echo $order->getTotal(); ?></strong></td>
+			</tr>
+	    </tfoot>
+	</table>
+</body>
+</html>
