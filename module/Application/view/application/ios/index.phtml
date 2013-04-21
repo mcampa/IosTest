@@ -32,19 +32,19 @@
 	<tbody>
 		<?php foreach($orders as $order) : ?>
 		<tr>
-		    <td>
+			<td>
 				<a href="<?php echo '/ios/order/'.$order->getId();?>" role="button" class="btn btn-info">
 					<i class="icon-file icon-white"></i>
 				</a>
 				<a href="<?php echo '/ios/download/'.$order->getId();?>" role="button" class="btn btn-warning">
 					<i class="icon-download-alt icon-white"></i>
 				</a>
-		    </td>
-		    <td><?php echo sprintf('%04d', $order->getId());?></td>
-		    <td><?php echo $order->createdDate()->format("F j, Y, g:i a");?></td>
-		    <td><?php echo $order->getCustomer();?></td>
-		    <td><?php echo count($order->getItems());?></td>
-		    <td style="text-align:right;">$<?php echo number_format($order->getTotal(), 2);?></td>
+			</td>
+			<td><?php echo sprintf('%04d', $order->getId());?></td>
+			<td><?php echo $order->createdDate()->format("F j, Y, g:i a");?></td>
+			<td><?php echo $order->getCustomer();?></td>
+			<td><?php echo count($order->getItems());?></td>
+			<td style="text-align:right;">$<?php echo number_format($order->getTotal(), 2);?></td>
 		</tr>
 		<?php endforeach; ?>
 	</tbody>

@@ -114,12 +114,12 @@
 			<td style="text-align:right;">$<span data-bind="text: total()"></span></td>
 		</tr>
 	</tbody>
-    <tfoot>
+	<tfoot>
 		<tr>
 			<td colspan="4"></td>
 			<td style="text-align:right; font-size:20px;">$<strong data-bind="text: total"></strong></td>
 		</tr>
-    </tfoot>
+	</tfoot>
 </table>
 
 
@@ -138,9 +138,9 @@
 	var ViewModel = function() {
 		var self = this;
 
-	    var plainItem = function(item) {
-	    	return {id: item.id(), product: item.product(), quantity: item.quantity(), price: item.price()};
-	    }
+		var plainItem = function(item) {
+			return {id: item.id(), product: item.product(), quantity: item.quantity(), price: item.price()};
+		}
 	 
 		var input = function(name) {
 			return $('#addProductModal input[name="'+name+'"]').val();
@@ -164,93 +164,93 @@
 			return total;	
 		}
 
-	    self.items = ko.observableArray([]);
+		self.items = ko.observableArray([]);
 
-	    self.total = ko.observable(0);
+		self.total = ko.observable(0);
 
-	 	self.editItemClick = function(item) {
-	 		$('#editId').val(item.id());
-	 		$('#editProduct').val(item.product());
-	 		$('#editQty').val(item.quantity());
-	 		$('#editPrice').val(item.price());
-	 	}
+		self.editItemClick = function(item) {
+			$('#editId').val(item.id());
+			$('#editProduct').val(item.product());
+			$('#editQty').val(item.quantity());
+			$('#editPrice').val(item.price());
+		}
 
-	 	self.editItemSave = function() {
-	 		var item = { 
-	    		id: 		$('#editId').val(), 
-	    		product: 	$('#editProduct').val(), 
-	    		quantity: 	$('#editQty').val(), 
-	    		price: 		$('#editPrice').val(),
-	    	};
+		self.editItemSave = function() {
+			var item = { 
+				id: 		$('#editId').val(), 
+				product: 	$('#editProduct').val(), 
+				quantity: 	$('#editQty').val(), 
+				price: 		$('#editPrice').val(),
+			};
 
 			if (validateItem(item)) {
 				$.post('/ajax/updateItem/'+order_id, item, function(response) {
 					$('#editProductModal').modal('hide');
-			    	var items = self.items();
-			    	$.each(items, function(index, item) {
-			    		if(parseInt(item.id()) == parseInt(response.item.id)) {
-			    			items[index] = (new ItemModel(response.item));
-			    		}
-			    		self.items(items);
-		        		self.calcTotal();
-			    	});
+					var items = self.items();
+					$.each(items, function(index, item) {
+						if(parseInt(item.id()) == parseInt(response.item.id)) {
+							items[index] = (new ItemModel(response.item));
+						}
+						self.items(items);
+						self.calcTotal();
+					});
 				}, 'json');
 			} else {
 				alert('Not Valid Inputs');
 			}
-	 	}
+		}
 
-	    self.addItemClick = function() {
+		self.addItemClick = function() {
 
-	    	var item = { 
-	    		product: input('product'), 
-	    		quantity: input('quantity'), 
-	    		price: input('price'),
-	    	};
+			var item = { 
+				product: input('product'), 
+				quantity: input('quantity'), 
+				price: input('price'),
+			};
 
 			if (validateItem(item)) {
-			    $.post('/ajax/saveItem/'+order_id, item, function(response) {
+				$.post('/ajax/saveItem/'+order_id, item, function(response) {
 					$('#addProductModal').modal('hide');
-		    		var item = response.item;
-		    		self.addItem(item);
+					var item = response.item;
+					self.addItem(item);
 				}, 'json');
 			} else {				
 				alert('Not Valid Inputs');
 			}
 
-	    }
+		}
 
-	 	self.removeItemClick = function (item) {
-		    $.post('/ajax/removeItem/'+order_id, plainItem(item), function(response) {
-		    	var items = self.items();
-		    	for (var i = 0; i < items.length; i++) {
-		    		if(parseInt(items[i].id()) == parseInt(response.item.id)) {
-		    			items.splice(i, 1);
-		    			break;
-		    		}
-		    	}
-	    		self.items(items);
-        		self.calcTotal();
+		self.removeItemClick = function (item) {
+			$.post('/ajax/removeItem/'+order_id, plainItem(item), function(response) {
+				var items = self.items();
+				for (var i = 0; i < items.length; i++) {
+					if(parseInt(items[i].id()) == parseInt(response.item.id)) {
+						items.splice(i, 1);
+						break;
+					}
+				}
+				self.items(items);
+				self.calcTotal();
 
 			}, 'json');
 		}
 
-	    self.addItem = function(item) {
+		self.addItem = function(item) {
 
-	        self.items.push(new ItemModel(item));
+			self.items.push(new ItemModel(item));
 
-	        self.calcTotal();
-	    };
+			self.calcTotal();
+		};
 
 
-	    $.post('/ajax/order/'+order_id, {}, function(response) {
-	    	if (response.items.length > 0) {
-	    		$.each(response.items, function(index, item) {
-		    		self.addItem(item);
-		    	});
-	    	} else {
-	    		$('#addProductModal').modal('show');
-	    	}	
+		$.post('/ajax/order/'+order_id, {}, function(response) {
+			if (response.items.length > 0) {
+				$.each(response.items, function(index, item) {
+					self.addItem(item);
+				});
+			} else {
+				$('#addProductModal').modal('show');
+			}	
 		}, 'json');	 
 	 
 	};	 
@@ -268,7 +268,7 @@
 	$("#deleteOrder").click(function() {
 		if (confirm("Are you sure?")) {
 			$.post('/ajax/deleteOrder/'+order_id, {order_id: order_id}, function(response) {
-	    		window.location = "/ios/index";	    	
+				window.location = "/ios/index";	    	
 			}, 'json');	 
 		}
 	});

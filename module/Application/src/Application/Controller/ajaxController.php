@@ -19,100 +19,100 @@ class ajaxController extends EntityUsingController
 {
 
 	public function indexAction()
-    {
-        $em = $this->getEntityManager();
+	{
+		$em = $this->getEntityManager();
 
-        $orders = $em->getRepository('Application\Entity\Order')->findBy(array(), array('name' => 'ASC'));
+		$orders = $em->getRepository('Application\Entity\Order')->findBy(array(), array('name' => 'ASC'));
 
-        return new JsonModel(array('orders' => $orders,));
-    }
+		return new JsonModel(array('orders' => $orders,));
+	}
 
-    public function orderAction() {        
-		    
+	public function orderAction() {        
+			
 		$em = $this->getEntityManager();
 
 		$items = array();
 		
 		$order_id = $this->params('id');
-        $order = $em->getRepository('Application\Entity\Order')->find($order_id);
+		$order = $em->getRepository('Application\Entity\Order')->find($order_id);
 
-        foreach ($order->getItems() as $item) {
+		foreach ($order->getItems() as $item) {
 
-	        $items[] = array(
-	        	'id'  	   => $item->getId(),
-	        	'product'  => $item->getProduct(),
-	        	'quantity' => $item->getQuantity(),
-	        	'price'    => $item->getPrice(),
-        	);
-        }
+			$items[] = array(
+				'id'  	   => $item->getId(),
+				'product'  => $item->getProduct(),
+				'quantity' => $item->getQuantity(),
+				'price'    => $item->getPrice(),
+			);
+		}
 
 		$response = array('items' => $items);
 
 
-        return new JsonModel($response);
-    }
+		return new JsonModel($response);
+	}
 
 
 	public function saveItemAction() {
 
 		$response = array();
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-		    
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			
 			$em = $this->getEntityManager();
 
 			$order_id = $this->params('id');
-	        $order = $em->getRepository('Application\Entity\Order')->find($order_id);
+			$order = $em->getRepository('Application\Entity\Order')->find($order_id);
 
-	        if ($order) {
+			if ($order) {
 
-	            $data = $request->getPost();
+				$data = $request->getPost();
 
-	            $itemData = array(
-	            	'product'  => $data->product,
-	            	'quantity' => $data->quantity,
-	            	'price'    => $data->price,
-	            );
-			    $item = new OrderItem((object)$itemData);
+				$itemData = array(
+					'product'  => $data->product,
+					'quantity' => $data->quantity,
+					'price'    => $data->price,
+				);
+				$item = new OrderItem((object)$itemData);
 
-			    $item->setOrder($order);
+				$item->setOrder($order);
 
-			    $em->persist($item);
-			    $em->flush();
+				$em->persist($item);
+				$em->flush();
 
-			    $itemData['id'] = $item->getId();
+				$itemData['id'] = $item->getId();
 
-			    $response = array('success' => true, 'item' => $itemData);
-	        }
+				$response = array('success' => true, 'item' => $itemData);
+			}
 
 		}
 
 
-        return new JsonModel($response);
+		return new JsonModel($response);
 	}
-    
+	
 
 	public function removeItemAction() {
 
 		$response = array();
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-		    
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			
 			$em = $this->getEntityManager();
 
-            $data = $request->getPost();
+			$data = $request->getPost();
 
-            $item = $em->getRepository('Application\Entity\OrderItem')->find($data->id);
-            
-		    $em->remove($item);
-		    $em->flush();
+			$item = $em->getRepository('Application\Entity\OrderItem')->find($data->id);
+			
+			$em->remove($item);
+			$em->flush();
 
-		    $response = array('success' => true, 'item' => $data);        
+			$response = array('success' => true, 'item' => $data);        
 
 		}
-        return new JsonModel($response);
+		return new JsonModel($response);
 	}
 
 
@@ -120,24 +120,24 @@ class ajaxController extends EntityUsingController
 
 		$response = array();
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-		    
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			
 			$em = $this->getEntityManager();
 
-            $data = $request->getPost();
+			$data = $request->getPost();
 
-            $item = $em->getRepository('Application\Entity\OrderItem')->find($data->id);
+			$item = $em->getRepository('Application\Entity\OrderItem')->find($data->id);
 
-	        $item->setData($data);	        
+			$item->setData($data);	        
 
-		    $em->persist($item);
-		    $em->flush();
+			$em->persist($item);
+			$em->flush();
 
-		    $response = array('success' => true, 'item' => $data);        
+			$response = array('success' => true, 'item' => $data);        
 
 		}
-        return new JsonModel($response);
+		return new JsonModel($response);
 	}
 
 
@@ -146,23 +146,23 @@ class ajaxController extends EntityUsingController
 
 		$response = array();
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
+		$request = $this->getRequest();
+		if ($request->isPost()) {
 
 			$em = $this->getEntityManager();		    
 
 			$order_id = $this->params('id');
-	        $order = $em->getRepository('Application\Entity\Order')->find($order_id);
+			$order = $em->getRepository('Application\Entity\Order')->find($order_id);
 
-	        if ($order) {
+			if ($order) {
 
-			    $em->remove($order);
-		    	$em->flush();
+				$em->remove($order);
+				$em->flush();
 
-		    	$response = array('success' => true, 'item' => $data);  
-	        }      
+				$response = array('success' => true, 'item' => $data);  
+			}      
 
 		}
-        return new JsonModel($response);
+		return new JsonModel($response);
 	}
 }
